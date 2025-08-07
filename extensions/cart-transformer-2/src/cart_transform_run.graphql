@@ -1,0 +1,11 @@
+query CartTransformRunInput {
+  cart {
+    attribute(key: "utm_source") {
+      value
+    }
+    lines {
+      id
+      quantity
+    }
+  }
+}
