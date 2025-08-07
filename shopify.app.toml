@@ -3,7 +3,7 @@
 client_id = "2f1aa141c1e326a85cf74a78470bf86b"
 name = "hdc-digital-app"
 handle = "hdc-digital-app"
-application_url = "https://receipt-italiano-layer-routine.trycloudflare.com"
+application_url = "https://hdc-digital.onrender.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_cart_transforms,write_products"
 
 [auth]
-redirect_urls = ["https://receipt-italiano-layer-routine.trycloudflare.com/auth/callback", "https://receipt-italiano-layer-routine.trycloudflare.com/auth/shopify/callback", "https://receipt-italiano-layer-routine.trycloudflare.com/api/auth/callback"]
+redirect_urls = ["https://hdc-digital.onrender.com/auth/callback", "https://hdc-digital.onrender.com/auth/shopify/callback", "https://hdc-digital.onrender.com/api/auth/callback"]
 
 [pos]
 embedded = false
