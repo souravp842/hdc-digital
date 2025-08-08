@@ -1,35 +1,46 @@
-/**
- * @param {import("../generated/api").CartTransformRunInput} input
- * @returns {import("../generated/api").CartTransformRunResult}
- */
 export function cartTransformRun(input) {
   const cart = input.cart;
   const utmSource = cart?.attribute?.value || 'default';
 
-  const pricingMap = {
-    google: 1500,
-    idealo: 1200,
-    direct: 1800,
-    default: 2000,
-  };
+  const operations = cart.lines.map((line) => {
+    const metafieldValue = line.merchandise?.product?.metafield?.value;
+    if (!metafieldValue) return null;
 
-  const priceInCents = pricingMap[utmSource] ?? pricingMap['default'];
+    let priceData;
+    try {
+      priceData = JSON.parse(metafieldValue);
+    } catch (e) {
+      return null;
+    }
 
-  // Create separate lineUpdate operations for each cart line
-  const operations = cart.lines.map((line) => ({
-    lineUpdate: {
-      cartLineId: line.id,
-      price: {
-        adjustment: {
-          fixedPricePerUnit: {
-            amount: priceInCents,
+    const sourcePrices = priceData[utmSource] || priceData['direct'] || priceData['default'];
+    if (!sourcePrices) return null;
+
+    // pick tiered price based on quantity
+    const qty = line.quantity;
+    let priceInCents = sourcePrices.base_price;
+    if (sourcePrices.tiers) {
+      const tierKeys = Object.keys(sourcePrices.tiers).map(Number).sort((a, b) => a - b);
+      for (const tierQty of tierKeys) {
+        if (qty >= tierQty) {
+          priceInCents = sourcePrices.tiers[tierQty];
+        }
+      }
+    }
+
+    return {
+      lineUpdate: {
+        cartLineId: line.id,
+        price: {
+          adjustment: {
+            fixedPricePerUnit: {
+              amount: priceInCents,
+            },
           },
         },
       },
-    }
-  }));
+    };
+  }).filter(Boolean);
 
-  return {
-    operations
-  };
+  return { operations };
 }

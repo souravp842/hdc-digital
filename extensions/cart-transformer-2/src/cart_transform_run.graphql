@@ -6,6 +6,15 @@ query CartTransformRunInput {
     lines {
       id
       quantity
+      merchandise {
+        ... on ProductVariant {
+          product {
+            metafield(namespace: "custom", key: "utm_prices") {
+              value
+            }
+          }
+        }
+      }
     }
   }
 }
