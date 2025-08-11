@@ -9,9 +9,12 @@ query CartTransformRunInput {
       merchandise {
         ... on ProductVariant {
           product {
-            metafield(namespace: "custom", key: "utm_prices") {
-              value
-            }
+            base_price: metafield(namespace: "custom", key: "base_price") { value }
+            tiered_price: metafield(namespace: "custom", key: "tiered_price") { value }
+            base_price_google: metafield(namespace: "custom", key: "base_price_google") { value }
+            tiered_price_google: metafield(namespace: "custom", key: "tiered_price_google") { value }
+            base_price_idealo: metafield(namespace: "custom", key: "base_price_idealo") { value }
+            tiered_price_idealo: metafield(namespace: "custom", key: "tiered_price_idealo") { value }
           }
         }
       }
