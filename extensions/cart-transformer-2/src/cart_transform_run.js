@@ -6,6 +6,7 @@ export function cartTransformRun(input) {
   }
 
   const cart = input.cart;
+  
   const utmSource = (cart?.attribute?.value || 'direct').toLowerCase();
 
   console.log('Cart Transform - UTM:', utmSource);
@@ -50,7 +51,26 @@ export function cartTransformRun(input) {
       }
 
       // --- 1) Try variant single metafield JSON first ---
-      const variantPricingRaw = variant?.variant_pricing?.value;
+      const customer = input?.cart?.buyerIdentity?.customer;
+
+let variantPricingRaw = null;
+
+// Guest user
+if (!customer) {
+  variantPricingRaw = variant?.variant_pricing?.value;
+} else {
+  const isPremium = customer?.tags?.includes('premium');
+
+  if (isPremium) {
+    variantPricingRaw =
+      variant?.variant_pricing_premium?.value ||
+      variant?.variant_pricing?.value; // fallback
+  } else {
+    variantPricingRaw =
+      variant?.variant_pricing_customer?.value ||
+      variant?.variant_pricing?.value; // fallback
+  }
+}
       let variantPricing = null;
       if (variantPricingRaw) {
         try {

@@ -3,6 +3,7 @@ api_version = "2025-07"
 [[extensions]]
 name = "t:name"
 handle = "cart-transformer-2"
+uid = "0e44597a-9283-ecee-c1c5-aad447c4fff555693f6f"
 type = "function"
 
 description = "t:description"
