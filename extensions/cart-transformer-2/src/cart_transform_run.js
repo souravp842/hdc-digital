@@ -6,8 +6,8 @@ export function cartTransformRun(input) {
   }
 
   const cart = input.cart;
-  
-  const utmSource = (cart?.attribute?.value || 'direct').toLowerCase();
+  const utmSource = (input?.cart?.utm?.value || 'direct').toLowerCase();
+const customerType = input?.cart?.customerType?.value;
 
   console.log('Cart Transform - UTM:', utmSource);
 
@@ -17,8 +17,6 @@ export function cartTransformRun(input) {
     console.warn('No cart lines found or cart.lines is not an array');
     return { operations: [] };
   }
-
-  const customer = input?.cart?.buyerIdentity?.customer;
 
   const operations = cartLines.map((line, index) => {
     try {
@@ -56,25 +54,25 @@ export function cartTransformRun(input) {
       }
 
       // --- 1) Try variant single metafield JSON first ---
-     
+      let variantPricingRaw = null;
 
-let variantPricingRaw = null;
-
-// Guest user
-if (!customer) {
+// Guest
+if (!customerType || customerType === 'guest') {
   variantPricingRaw = variant?.variant_pricing?.value;
-} else {
-  const isPremium = customer?.tags?.includes('premium');
+}
 
-  if (isPremium) {
-    variantPricingRaw =
-      variant?.variant_pricing_premium?.value ||
-      variant?.variant_pricing?.value; // fallback
-  } else {
-    variantPricingRaw =
-      variant?.variant_pricing_customer?.value ||
-      variant?.variant_pricing?.value; // fallback
-  }
+// Premium
+else if (customerType === 'premium') {
+  variantPricingRaw =
+    variant?.variant_pricing_premium?.value ||
+    variant?.variant_pricing?.value;
+}
+
+// Logged user
+else {
+  variantPricingRaw =
+    variant?.variant_pricing_customer?.value ||
+    variant?.variant_pricing?.value;
 }
       let variantPricing = null;
       if (variantPricingRaw) {
