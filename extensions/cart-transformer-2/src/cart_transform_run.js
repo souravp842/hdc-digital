@@ -18,6 +18,8 @@ export function cartTransformRun(input) {
     return { operations: [] };
   }
 
+  const customer = input?.cart?.buyerIdentity?.customer;
+
   const operations = cartLines.map((line, index) => {
     try {
       // Additional validation for line object
@@ -36,7 +38,10 @@ export function cartTransformRun(input) {
       const qty = line.quantity || 1;
 
       // --- Early exit: skip if BOTH variant and product pricing metafields are empty ---
-      const noVariantPricing = !variant?.variant_pricing?.value;
+      const noVariantPricing =
+  !variant?.variant_pricing?.value &&
+  !variant?.variant_pricing_customer?.value &&
+  !variant?.variant_pricing_premium?.value;
       const noProductPricing =
         !product?.base_price?.value &&
         !product?.tiered_price?.value &&
@@ -51,7 +56,7 @@ export function cartTransformRun(input) {
       }
 
       // --- 1) Try variant single metafield JSON first ---
-      const customer = input?.cart?.buyerIdentity?.customer;
+     
 
 let variantPricingRaw = null;
 
