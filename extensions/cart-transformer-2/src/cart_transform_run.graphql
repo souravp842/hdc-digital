@@ -3,18 +3,36 @@ query CartTransformRun {
     attribute(key: "utm_source") {
       value
     }
+
+    # ✅ ADD CUSTOMER (for tags like premium)
+    buyerIdentity {
+      customer {
+        id
+        tags
+      }
+    }
+
     lines {
       id
       quantity
       merchandise {
         ... on ProductVariant {
           id
-          # single variant metafield (JSON)
+
+          # ✅ ALL VARIANT METAFIELDS (IMPORTANT)
           variant_pricing: metafield(namespace: "custom", key: "pricing") {
             value
           }
 
-          # product-level metafields (left as-is)
+          variant_pricing_customer: metafield(namespace: "custom", key: "pricing_customer") {
+            value
+          }
+
+          variant_pricing_premium: metafield(namespace: "custom", key: "pricing_premium") {
+            value
+          }
+
+          # ✅ PRODUCT METAFIELDS (same as before)
           product {
             base_price: metafield(namespace: "custom", key: "base_price") { value }
             tiered_price: metafield(namespace: "custom", key: "tiered_price") { value }
