@@ -1,16 +1,15 @@
 export function cartTransformRun(input) {
-  // Add input validation
   if (!input || !input.cart) {
     console.warn('Invalid input: missing cart data');
     return { operations: [] };
   }
 
   const cart = input.cart;
-  const utmSource = (cart?.attribute?.value || 'direct').toLowerCase();
+  const utmSource = (cart?.utm?.value || 'direct').toLowerCase();
+  const customerType = (cart?.customerType?.value || 'guest').toLowerCase();
 
-  console.log('Cart Transform - UTM:', utmSource);
+  console.log('Cart Transform - UTM:', utmSource, '| Customer Type:', customerType);
 
-  // More robust cart.lines validation
   const cartLines = cart.lines;
   if (!Array.isArray(cartLines) || cartLines.length === 0) {
     console.warn('No cart lines found or cart.lines is not an array');
@@ -19,7 +18,6 @@ export function cartTransformRun(input) {
 
   const operations = cartLines.map((line, index) => {
     try {
-      // Additional validation for line object
       if (!line || typeof line !== 'object') {
         console.warn(`Invalid line object at index ${index}`);
         return null;
@@ -35,7 +33,10 @@ export function cartTransformRun(input) {
       const qty = line.quantity || 1;
 
       // --- Early exit: skip if BOTH variant and product pricing metafields are empty ---
-      const noVariantPricing = !variant?.variant_pricing?.value;
+      const noVariantPricing =
+        !variant?.variant_pricing?.value &&
+        !variant?.variant_pricing_customer?.value &&
+        !variant?.variant_pricing_premium?.value;
       const noProductPricing =
         !product?.base_price?.value &&
         !product?.tiered_price?.value &&
@@ -49,8 +50,21 @@ export function cartTransformRun(input) {
         return null;
       }
 
-      // --- 1) Try variant single metafield JSON first ---
-      const variantPricingRaw = variant?.variant_pricing?.value;
+      // --- Pick correct variant pricing metafield based on customer type ---
+      let variantPricingRaw = null;
+      if (customerType === 'premium') {
+        variantPricingRaw =
+          variant?.variant_pricing_premium?.value ||
+          variant?.variant_pricing?.value;
+      } else if (customerType === 'kunde') {
+        variantPricingRaw =
+          variant?.variant_pricing_customer?.value ||
+          variant?.variant_pricing?.value;
+      } else {
+        // guest
+        variantPricingRaw = variant?.variant_pricing?.value;
+      }
+
       let variantPricing = null;
       if (variantPricingRaw) {
         try {
@@ -63,9 +77,12 @@ export function cartTransformRun(input) {
         }
       }
 
-      // keys depending on utmSource
-      const baseKey = utmSource === 'direct' ? 'base_price' : `base_price_${utmSource}`;
-      const tierKey = utmSource === 'direct' ? 'tiered_price' : `tiered_price_${utmSource}`;
+      // --- Keys depending on utmSource ---
+      // For customer-based sources, base_price key is always 'base_price'
+      // For utm-based sources (google, idealo), use base_price_google etc.
+      const isCustomerSource = ['direct', 'kunde', 'premium', 'gast'].includes(utmSource);
+      const baseKey = isCustomerSource ? 'base_price' : `base_price_${utmSource}`;
+      const tierKey = isCustomerSource ? 'tiered_price' : `tiered_price_${utmSource}`;
 
       let basePrice = null;
       let tieredPriceObj = null;
@@ -115,7 +132,6 @@ export function cartTransformRun(input) {
         }
       }
 
-      // Ensure we have a valid line ID
       if (!line.id) {
         console.warn(`Missing line ID for cart line at index ${index}. Skipping.`);
         return null;
