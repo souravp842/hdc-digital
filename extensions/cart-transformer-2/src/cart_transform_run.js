@@ -7,7 +7,7 @@ export function cartTransformRun(input) {
 
   const cart = input.cart;
   const utmSource = (input?.cart?.utm?.value || 'direct').toLowerCase();
-const customerType = input?.cart?.customerType?.value;
+  const customerType = input?.cart?.customerType?.value;
 
   console.log('Cart Transform - UTM:', utmSource);
 
@@ -37,9 +37,9 @@ const customerType = input?.cart?.customerType?.value;
 
       // --- Early exit: skip if BOTH variant and product pricing metafields are empty ---
       const noVariantPricing =
-  !variant?.variant_pricing?.value &&
-  !variant?.variant_pricing_customer?.value &&
-  !variant?.variant_pricing_premium?.value;
+        !variant?.variant_pricing?.value &&
+        !variant?.variant_pricing_customer?.value &&
+        !variant?.variant_pricing_premium?.value;
       const noProductPricing =
         !product?.base_price?.value &&
         !product?.tiered_price?.value &&
@@ -56,24 +56,24 @@ const customerType = input?.cart?.customerType?.value;
       // --- 1) Try variant single metafield JSON first ---
       let variantPricingRaw = null;
 
-// Guest
-if (!customerType || customerType === 'guest') {
-  variantPricingRaw = variant?.variant_pricing?.value;
-}
+      // Guest
+      if (!customerType || customerType === 'guest') {
+        variantPricingRaw = variant?.variant_pricing?.value;
+      }
 
-// Premium
-else if (customerType === 'premium') {
-  variantPricingRaw =
-    variant?.variant_pricing_premium?.value ||
-    variant?.variant_pricing?.value;
-}
+      // Premium
+      else if (customerType === 'premium') {
+        variantPricingRaw =
+          variant?.variant_pricing_premium?.value ||
+          variant?.variant_pricing?.value;
+      }
 
-// Logged user
-else {
-  variantPricingRaw =
-    variant?.variant_pricing_customer?.value ||
-    variant?.variant_pricing?.value;
-}
+      // Logged user
+      else {
+        variantPricingRaw =
+          variant?.variant_pricing_customer?.value ||
+          variant?.variant_pricing?.value;
+      }
       let variantPricing = null;
       if (variantPricingRaw) {
         try {
@@ -87,8 +87,9 @@ else {
       }
 
       // keys depending on utmSource
-      const baseKey = utmSource === 'direct' ? 'base_price' : `base_price_${utmSource}`;
-      const tierKey = utmSource === 'direct' ? 'tiered_price' : `tiered_price_${utmSource}`;
+      const isCustomerKey = ['direct', 'kunde', 'premium', 'gast'].includes(utmSource);
+      const baseKey = isCustomerKey ? 'base_price' : `base_price_${utmSource}`;
+      const tierKey = isCustomerKey ? 'tiered_price' : `tiered_price_${utmSource}`;
 
       let basePrice = null;
       let tieredPriceObj = null;
