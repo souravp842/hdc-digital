@@ -1,42 +1,17 @@
 query CartTransformRun {
   cart {
-<<<<<<< HEAD
-    # ✅ UTM
-    utm: attribute(key: "utm_source") {
-=======
     utm: attribute(key: "utm_source") {
       value
     }
     customerType: attribute(key: "customer_type") {
->>>>>>> 7e2d378
       value
     }
-
-    # ✅ Customer type
-    customerType: attribute(key: "customer_type") {
-      value
-    }
-
     lines {
       id
       quantity
       merchandise {
         ... on ProductVariant {
           id
-<<<<<<< HEAD
-
-          # ✅ ONLY VARIANT METAFIELDS (LIGHTWEIGHT)
-          variant_pricing: metafield(namespace: "custom", key: "pricing") {
-            value
-          }
-
-          variant_pricing_customer: metafield(namespace: "custom", key: "pricing_customer") {
-            value
-          }
-
-          variant_pricing_premium: metafield(namespace: "custom", key: "pricing_premium") {
-            value
-=======
           variant_pricing: metafield(namespace: "custom", key: "pricing") {
             value
           }
@@ -53,7 +28,6 @@ query CartTransformRun {
             tiered_price_google: metafield(namespace: "custom", key: "tiered_price_google") { value }
             base_price_idealo: metafield(namespace: "custom", key: "base_price_idealo") { value }
             tiered_price_idealo: metafield(namespace: "custom", key: "tiered_price_idealo") { value }
->>>>>>> 7e2d378
           }
         }
       }

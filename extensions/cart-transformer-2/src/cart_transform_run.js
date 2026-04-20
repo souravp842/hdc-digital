@@ -5,13 +5,8 @@ export function cartTransformRun(input) {
   }
 
   const cart = input.cart;
-<<<<<<< HEAD
-  const utmSource = (input?.cart?.utm?.value || 'direct').toLowerCase();
-  const customerType = input?.cart?.customerType?.value;
-=======
   const utmSource = (cart?.utm?.value || 'direct').toLowerCase();
   const customerType = (cart?.customerType?.value || 'guest').toLowerCase();
->>>>>>> 7e2d378
 
   console.log('Cart Transform - UTM:', utmSource, '| Customer Type:', customerType);
 
@@ -55,29 +50,6 @@ export function cartTransformRun(input) {
         return null;
       }
 
-<<<<<<< HEAD
-      // --- 1) Try variant single metafield JSON first ---
-      let variantPricingRaw = null;
-
-      // Guest
-      if (!customerType || customerType === 'guest') {
-        variantPricingRaw = variant?.variant_pricing?.value;
-      }
-
-      // Premium
-      else if (customerType === 'premium') {
-        variantPricingRaw =
-          variant?.variant_pricing_premium?.value ||
-          variant?.variant_pricing?.value;
-      }
-
-      // Logged user
-      else {
-        variantPricingRaw =
-          variant?.variant_pricing_customer?.value ||
-          variant?.variant_pricing?.value;
-      }
-=======
       // --- Pick correct variant pricing metafield based on customer type ---
       let variantPricingRaw = null;
       if (customerType === 'premium') {
@@ -93,7 +65,6 @@ export function cartTransformRun(input) {
         variantPricingRaw = variant?.variant_pricing?.value;
       }
 
->>>>>>> 7e2d378
       let variantPricing = null;
       if (variantPricingRaw) {
         try {
@@ -106,19 +77,12 @@ export function cartTransformRun(input) {
         }
       }
 
-<<<<<<< HEAD
-      // keys depending on utmSource
-      const isCustomerKey = ['direct', 'kunde', 'premium', 'gast'].includes(utmSource);
-      const baseKey = isCustomerKey ? 'base_price' : `base_price_${utmSource}`;
-      const tierKey = isCustomerKey ? 'tiered_price' : `tiered_price_${utmSource}`;
-=======
       // --- Keys depending on utmSource ---
       // For customer-based sources, base_price key is always 'base_price'
       // For utm-based sources (google, idealo), use base_price_google etc.
       const isCustomerSource = ['direct', 'kunde', 'premium', 'gast'].includes(utmSource);
       const baseKey = isCustomerSource ? 'base_price' : `base_price_${utmSource}`;
       const tierKey = isCustomerSource ? 'tiered_price' : `tiered_price_${utmSource}`;
->>>>>>> 7e2d378
 
       let basePrice = null;
       let tieredPriceObj = null;
